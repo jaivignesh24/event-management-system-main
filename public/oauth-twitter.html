@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authorize App - Twitter/X</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #ffffff;
+      color: #0f1419;
+    }
+    .card {
+      border: 1px solid #eff3f4;
+      border-radius: 16px;
+      padding: 32px;
+      width: 380px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .logo {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+    }
+    p {
+      font-size: 14px;
+      color: #536471;
+      margin: 0 0 24px 0;
+      line-height: 1.4;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: #0f1419;
+      color: white;
+      border: none;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #272c30;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <svg class="logo" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+    </svg>
+    <h1>Authorize Aurora Fest 2026</h1>
+    <p>Authorize this application to access your profile settings, view your screen name, and retrieve your email address.</p>
+    <button class="btn" onclick="authorize()">Authorize X-user</button>
+  </div>
+
+  <script>
+    function authorize() {
+      window.opener.postMessage({
+        source: 'oauth-twitter',
+        user: {
+          name: 'Social Student',
+          email: 'twitter.fest@aurora.edu.in',
+          avatar: 'https://ui-avatars.com/api/?name=Social+Student&background=000&color=fff'
+        }
+      }, window.location.origin);
+      window.close();
+    }
+  </script>
+</body>
+</html>

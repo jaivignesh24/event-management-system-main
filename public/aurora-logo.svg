@@ -1,0 +1,19 @@
+<svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aurora University Logo">
+  <defs>
+    <linearGradient id="auroraBrandGradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="45%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+    <linearGradient id="auroraGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="rgba(147, 51, 234, 0.34)" />
+      <stop offset="100%" stop-color="rgba(236, 72, 153, 0.15)" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="120" rx="32" fill="#070A1A" />
+  <circle cx="64" cy="60" r="36" fill="url(#auroraGlow)" opacity="0.75" />
+  <path d="M 32 64 C 40 36 62 26 88 36 C 110 46 122 76 110 96 C 96 120 58 118 40 92" fill="none" stroke="url(#auroraBrandGradient)" stroke-width="10" stroke-linecap="round" />
+  <circle cx="92" cy="46" r="5" fill="#FFFFFF" opacity="0.9" />
+  <text x="148" y="50" font-family="Outfit, Inter, sans-serif" font-weight="900" font-size="44" fill="url(#auroraBrandGradient)">AURORA</text>
+  <text x="148" y="82" font-family="Outfit, Inter, sans-serif" font-weight="700" font-size="16" fill="#F8FAFC" letter-spacing="2">UNIVERSITY FEST</text>
+</svg>

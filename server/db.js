@@ -176,6 +176,59 @@ async function initializeSchema() {
     );
   `;
 
+  const volunteerTasksTableSql = `
+    CREATE TABLE IF NOT EXISTS volunteer_tasks (
+      id SERIAL PRIMARY KEY,
+      volunteer_name VARCHAR(255) NOT NULL,
+      role VARCHAR(50) DEFAULT 'volunteer',
+      event_title VARCHAR(255) NOT NULL,
+      task_description TEXT NOT NULL,
+      shift VARCHAR(100) NOT NULL,
+      status VARCHAR(50) DEFAULT 'Assigned',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  const volunteerAttendanceTableSql = `
+    CREATE TABLE IF NOT EXISTS volunteer_attendance (
+      id SERIAL PRIMARY KEY,
+      volunteer_name VARCHAR(255) NOT NULL,
+      event_title VARCHAR(255) NOT NULL,
+      shift VARCHAR(100) NOT NULL,
+      date VARCHAR(50) NOT NULL,
+      check_in_time VARCHAR(50) NOT NULL,
+      check_out_time VARCHAR(50),
+      status VARCHAR(50) DEFAULT 'Present',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  const volunteerRatingsTableSql = `
+    CREATE TABLE IF NOT EXISTS volunteer_ratings (
+      id SERIAL PRIMARY KEY,
+      volunteer_name VARCHAR(255) UNIQUE NOT NULL,
+      rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+      feedback TEXT,
+      rated_by VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  const volunteerMessagesTableSql = `
+    CREATE TABLE IF NOT EXISTS volunteer_messages (
+      id SERIAL PRIMARY KEY,
+      sender_name VARCHAR(255) NOT NULL,
+      sender_email VARCHAR(255) NOT NULL,
+      club_id INTEGER NOT NULL,
+      club_name VARCHAR(255) NOT NULL,
+      message TEXT NOT NULL,
+      timestamp VARCHAR(100) NOT NULL,
+      reply TEXT,
+      replied_at VARCHAR(100),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
   // Create tables sequentially
   await pool.query(clubsTableSql);
   await pool.query(membersTableSql);
@@ -184,6 +237,10 @@ async function initializeSchema() {
   await pool.query(eventsTableSql);
   await pool.query(registrationsTableSql);
   await pool.query(feedbacksTableSql);
+  await pool.query(volunteerTasksTableSql);
+  await pool.query(volunteerAttendanceTableSql);
+  await pool.query(volunteerRatingsTableSql);
+  await pool.query(volunteerMessagesTableSql);
   console.log("Database tables verified/created successfully.");
 
   // Check if seeding is required for clubs

@@ -29,7 +29,7 @@ export const Register = () => {
         navigate('/superadmin');
       } else if (currentUser.role === 'admin') {
         navigate('/admin');
-      } else if (currentUser.role === 'volunteer') {
+      } else if (['volunteer', 'head_volunteer', 'coordinator'].includes(currentUser.role)) {
         navigate('/volunteer');
       } else {
         navigate('/dashboard');

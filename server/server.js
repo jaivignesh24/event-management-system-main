@@ -1159,6 +1159,225 @@ app.get("/api/registrations/:email", dbCheck, async (req, res) => {
   }
 });
 
+// ==========================================
+// VOLUNTEER CORE ROUTES
+// ==========================================
+
+// Get all volunteer tasks or tasks for specific volunteer
+app.get("/api/volunteers/tasks", dbCheck, async (req, res) => {
+  const { volunteer_name } = req.query;
+  try {
+    let result;
+    if (volunteer_name) {
+      result = await pool.query(
+        "SELECT * FROM volunteer_tasks WHERE volunteer_name = $1 ORDER BY id DESC",
+        [volunteer_name]
+      );
+    } else {
+      result = await pool.query("SELECT * FROM volunteer_tasks ORDER BY id DESC");
+    }
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Fetch volunteer tasks error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Create new volunteer task
+app.post("/api/volunteers/tasks", dbCheck, async (req, res) => {
+  const { volunteerName, role, eventTitle, taskDescription, shift } = req.body;
+  if (!volunteerName || !eventTitle || !taskDescription || !shift) {
+    return res.status(400).json({ success: false, message: "Please fill in all task specifications." });
+  }
+  try {
+    const result = await pool.query(
+      `INSERT INTO volunteer_tasks (volunteer_name, role, event_title, task_description, shift, status)
+       VALUES ($1, $2, $3, $4, $5, 'Assigned') RETURNING *`,
+      [volunteerName, role || 'volunteer', eventTitle, taskDescription, shift]
+    );
+    res.status(201).json({ success: true, task: result.rows[0] });
+  } catch (err) {
+    console.error("Create volunteer task error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Update volunteer task status
+app.put("/api/volunteers/tasks/:id", dbCheck, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) {
+    return res.status(400).json({ success: false, message: "Missing next status designation." });
+  }
+  try {
+    const result = await pool.query(
+      "UPDATE volunteer_tasks SET status = $1 WHERE id = $2 RETURNING *",
+      [status, parseInt(id)]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: "Task allocation not found." });
+    }
+    res.json({ success: true, task: result.rows[0] });
+  } catch (err) {
+    console.error("Update task status error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Get volunteer attendance logs
+app.get("/api/volunteers/attendance", dbCheck, async (req, res) => {
+  const { volunteer_name } = req.query;
+  try {
+    let result;
+    if (volunteer_name) {
+      result = await pool.query(
+        "SELECT * FROM volunteer_attendance WHERE volunteer_name = $1 ORDER BY id DESC",
+        [volunteer_name]
+      );
+    } else {
+      result = await pool.query("SELECT * FROM volunteer_attendance ORDER BY id DESC");
+    }
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Fetch volunteer attendance error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Log check-in attendance
+app.post("/api/volunteers/attendance", dbCheck, async (req, res) => {
+  const { volunteerName, eventTitle, shift, date, checkInTime } = req.body;
+  if (!volunteerName || !eventTitle || !shift || !date || !checkInTime) {
+    return res.status(400).json({ success: false, message: "Missing check-in parameter fields." });
+  }
+  try {
+    const result = await pool.query(
+      `INSERT INTO volunteer_attendance (volunteer_name, event_title, shift, date, check_in_time, status)
+       VALUES ($1, $2, $3, $4, $5, 'Present') RETURNING *`,
+      [volunteerName, eventTitle, shift, date, checkInTime]
+    );
+    res.status(201).json({ success: true, log: result.rows[0] });
+  } catch (err) {
+    console.error("Check-in error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Log check-out time
+app.put("/api/volunteers/attendance/checkout", dbCheck, async (req, res) => {
+  const { volunteerName, eventTitle, checkOutTime } = req.body;
+  if (!volunteerName || !eventTitle || !checkOutTime) {
+    return res.status(400).json({ success: false, message: "Missing checkout parameters." });
+  }
+  try {
+    const result = await pool.query(
+      `UPDATE volunteer_attendance 
+       SET check_out_time = $1 
+       WHERE volunteer_name = $2 AND event_title = $3 AND check_out_time IS NULL RETURNING *`,
+      [checkOutTime, volunteerName, eventTitle]
+    );
+    res.json({ success: true, log: result.rows[0] });
+  } catch (err) {
+    console.error("Check-out error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Get volunteer ratings
+app.get("/api/volunteers/ratings", dbCheck, async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM volunteer_ratings");
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Fetch ratings error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Create/Update volunteer rating (coordinators only)
+app.post("/api/volunteers/ratings", dbCheck, async (req, res) => {
+  const { volunteerName, rating, feedback, ratedBy } = req.body;
+  if (!volunteerName || !rating) {
+    return res.status(400).json({ success: false, message: "Missing rating parameters." });
+  }
+  try {
+    const result = await pool.query(
+      `INSERT INTO volunteer_ratings (volunteer_name, rating, feedback, rated_by)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (volunteer_name) 
+       DO UPDATE SET rating = $2, feedback = $3, rated_by = $4 RETURNING *`,
+      [volunteerName, parseInt(rating), feedback || '', ratedBy || '']
+    );
+    res.json({ success: true, rating: result.rows[0] });
+  } catch (err) {
+    console.error("Save rating error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Get coordinator messages
+app.get("/api/volunteers/messages", dbCheck, async (req, res) => {
+  const { club_id } = req.query;
+  try {
+    let result;
+    if (club_id) {
+      result = await pool.query(
+        "SELECT * FROM volunteer_messages WHERE club_id = $1 ORDER BY id DESC",
+        [parseInt(club_id)]
+      );
+    } else {
+      result = await pool.query("SELECT * FROM volunteer_messages ORDER BY id DESC");
+    }
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Fetch messages error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Send helpdesk message
+app.post("/api/volunteers/messages", dbCheck, async (req, res) => {
+  const { senderName, senderEmail, clubId, clubName, message, timestamp } = req.body;
+  if (!senderName || !senderEmail || !clubId || !message) {
+    return res.status(400).json({ success: false, message: "Missing message details." });
+  }
+  try {
+    const result = await pool.query(
+      `INSERT INTO volunteer_messages (sender_name, sender_email, club_id, club_name, message, timestamp)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [senderName, senderEmail, parseInt(clubId), clubName || 'General', message, timestamp || new Date().toLocaleString()]
+    );
+    res.status(201).json({ success: true, message: result.rows[0] });
+  } catch (err) {
+    console.error("Send message error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
+// Reply to message
+app.put("/api/volunteers/messages/:id/reply", dbCheck, async (req, res) => {
+  const { id } = req.params;
+  const { reply } = req.body;
+  if (!reply) {
+    return res.status(400).json({ success: false, message: "Reply body cannot be empty." });
+  }
+  try {
+    const result = await pool.query(
+      `UPDATE volunteer_messages 
+       SET reply = $1, replied_at = $2 
+       WHERE id = $3 RETURNING *`,
+      [reply, new Date().toLocaleString(), parseInt(id)]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: "Message thread not found." });
+    }
+    res.json({ success: true, message: result.rows[0] });
+  } catch (err) {
+    console.error("Reply message error:", err);
+    res.status(500).json({ success: false, message: "Database error: " + err.message });
+  }
+});
+
 // Startup backend
 app.listen(PORT, () => {
   console.log(`🚀 Express server running on port ${PORT}`);

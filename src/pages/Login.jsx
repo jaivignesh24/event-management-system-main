@@ -23,7 +23,7 @@ export const Login = () => {
         navigate('/superadmin');
       } else if (currentUser.role === 'admin') {
         navigate('/admin');
-      } else if (currentUser.role === 'volunteer') {
+      } else if (['volunteer', 'head_volunteer', 'coordinator'].includes(currentUser.role)) {
         navigate('/volunteer');
       } else {
         navigate('/dashboard');
@@ -101,7 +101,7 @@ export const Login = () => {
           navigate('/superadmin');
         } else if (response.user.role === 'admin') {
           navigate('/admin');
-        } else if (response.user.role === 'volunteer') {
+        } else if (['volunteer', 'head_volunteer', 'coordinator'].includes(response.user.role)) {
           navigate('/volunteer');
         } else {
           navigate('/dashboard');

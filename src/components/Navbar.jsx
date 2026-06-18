@@ -28,8 +28,10 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isVolunteerRole = currentUser && ['volunteer', 'head_volunteer', 'coordinator'].includes(currentUser.role);
+
   const homePath = currentUser 
-    ? (currentUser.role === 'superadmin' ? '/superadmin' : (currentUser.role === 'admin' ? '/admin' : (currentUser.role === 'volunteer' ? '/volunteer' : '/dashboard'))) 
+    ? (currentUser.role === 'superadmin' ? '/superadmin' : (currentUser.role === 'admin' ? '/admin' : (isVolunteerRole ? '/volunteer' : '/dashboard'))) 
     : '/';
 
   const navLinks = [
@@ -119,7 +121,7 @@ export const Navbar = () => {
                       <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
                       <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-3 z-50 text-left space-y-1">
                         <Link
-                          to={currentUser.role === 'superadmin' ? '/superadmin' : (currentUser.role === 'admin' ? '/admin' : (currentUser.role === 'volunteer' ? '/volunteer' : '/dashboard'))}
+                          to={currentUser.role === 'superadmin' ? '/superadmin' : (currentUser.role === 'admin' ? '/admin' : (isVolunteerRole ? '/volunteer' : '/dashboard'))}
                           onClick={() => setIsOpen(false)}
                           className="block px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
                         >
@@ -263,7 +265,7 @@ export const Navbar = () => {
                   </Link>
                 </>
               )}
-              {currentUser && currentUser.role === 'volunteer' && (
+              {currentUser && isVolunteerRole && (
                 <Link
                   to="/volunteer"
                   onClick={() => setIsOpen(false)}

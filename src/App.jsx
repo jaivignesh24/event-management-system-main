@@ -20,6 +20,9 @@ import { StudentDashboard } from './pages/StudentDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { VerifyPass } from './pages/VerifyPass';
 import { ViewCertificate } from './pages/ViewCertificate';
+import { SuperAdminDashboard } from './pages/SuperAdminDashboard';
+import { VolunteerDashboard } from './pages/VolunteerDashboard';
+import { ClubProvider } from './context/ClubContext';
 
 import './App.css';
 
@@ -28,38 +31,42 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <EventProvider>
-          <Router>
-            <div className="relative min-h-screen flex flex-col justify-between overflow-x-hidden bg-[var(--bg)] text-[var(--text-primary)] transition-colors duration-300">
-              
-              {/* Premium Glow FX Background & Cursor followers */}
-              <ParticleBg />
-              <CustomCursor />
+          <ClubProvider>
+            <Router>
+              <div className="relative min-h-screen flex flex-col justify-between overflow-x-hidden bg-[var(--bg)] text-[var(--text-primary)] transition-colors duration-300">
+                
+                {/* Premium Glow FX Background & Cursor followers */}
+                <ParticleBg />
+                <CustomCursor />
 
-              {/* Navigation Header */}
-              <Navbar />
+                {/* Navigation Header */}
+                <Navbar />
 
-              {/* Central View Content Routing */}
-              <main className="flex-1 w-full relative z-10 flex flex-col">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/events" element={<Events />} />
-                  <Route path="/events/:eventId" element={<EventDetails />} />
-                  <Route path="/clubs" element={<Clubs />} />
-                  <Route path="/gallery" element={<Gallery />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/dashboard" element={<StudentDashboard />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/verify" element={<VerifyPass />} />
-                  <Route path="/certificate" element={<ViewCertificate />} />
-                </Routes>
-              </main>
+                {/* Central View Content Routing */}
+                <main className="flex-1 w-full relative z-10 flex flex-col">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/events" element={<Events />} />
+                    <Route path="/events/:eventId" element={<EventDetails />} />
+                    <Route path="/clubs" element={<Clubs />} />
+                    <Route path="/gallery" element={<Gallery />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/dashboard" element={<StudentDashboard />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/superadmin" element={<SuperAdminDashboard />} />
+                    <Route path="/volunteer" element={<VolunteerDashboard />} />
+                    <Route path="/verify" element={<VerifyPass />} />
+                    <Route path="/certificate" element={<ViewCertificate />} />
+                  </Routes>
+                </main>
 
               {/* Responsive Brand Footer */}
               <Footer />
 
             </div>
           </Router>
+          </ClubProvider>
         </EventProvider>
       </AuthProvider>
     </ThemeProvider>

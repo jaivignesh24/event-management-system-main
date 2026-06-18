@@ -16,7 +16,7 @@
  *      - {{cert_id}}        : Credential ID
  *      - {{date_issued}}    : Date the certificate was issued
  *      - {{cert_url}}       : URL to view/print the certificate
- *      - {{from_name}}      : Sender name (e.g., Monisha)
+ *      - {{from_name}}      : Sender name (e.g., Jaivignesh)
  * 5. Copy your "Template ID" and paste it as EMAILJS_TEMPLATE_ID below.
  * 6. Go to Account > API Keys, copy your Public Key and paste as EMAILJS_PUBLIC_KEY below.
  */
@@ -51,7 +51,7 @@ export const sendCertificateEmail = async ({ toName, toEmail, eventName, certTyp
     cert_id: certId,
     date_issued: dateIssued,
     cert_url: certUrl,
-    from_name: 'Monisha – Aurora Academic Affairs'
+    from_name: 'Jaivignesh – Aurora Academic Affairs'
   };
 
   try {

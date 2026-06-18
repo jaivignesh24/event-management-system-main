@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Fest Portal - Student View</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+    <main class="glass-card" style="max-width: 550px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+      <div class="brand-logo" aria-hidden="true" style="margin-bottom: 0.5rem;">
+        <!-- Logo SVG -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+
+      <h1 style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #fff, #a7aacc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Aura 2026 Student View
+      </h1>
+
+      <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border-glass); border-radius: var(--radius-md); padding: 1.5rem; width: 100%;">
+        <p style="color: var(--text-main); font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">
+          You are not a volunteer.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+          Here is the regular student view of the Fest Portal. Student view is managed through the main React application on Port 5173.
+        </p>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.85rem;">
+        Testing the volunteer layout? Use the quick role switcher below to change your active role session and reload the routing page.
+      </p>
+
+      <div style="display: flex; gap: 1rem; width: 100%; justify-content: center;">
+        <button id="switch-role-btn" class="btn btn-primary" style="flex: 1; max-width: 260px;">
+          Become Volunteer (Test)
+        </button>
+        <a href="../" class="btn btn-outline" style="flex: 1; max-width: 140px; text-decoration: none;">
+          Main App
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { setCurrentUser } from './api.js';
+
+    document.getElementById('switch-role-btn').addEventListener('click', async () => {
+      // Set the role back to volunteer in localStorage
+      const mockVolunteer = {
+        name: 'Sneha Reddy',
+        email: 'sneha.reddy@aurora.edu.in',
+        role: 'volunteer',
+        department: 'Computer Science & Engineering'
+      };
+      
+      await setCurrentUser(mockVolunteer);
+      
+      // Redirect back to index.html router
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

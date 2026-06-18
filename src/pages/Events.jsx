@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useEvents } from '../context/EventContext';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, MapPin, Sparkles, CheckCircle, Info, X, Bookmark, Clock, ArrowRight } from 'lucide-react';
+import { Search, Calendar, MapPin, CheckCircle, Info, X, Bookmark, Clock } from 'lucide-react';
 
 export const Events = () => {
   const { events, registerForEvent, registrations } = useEvents();
@@ -50,7 +50,7 @@ export const Events = () => {
   const isBookmarked = (eventId) => bookmarks.includes(eventId);
 
   // Handle Event Registration
-  const handleRegister = (eventId) => {
+  const handleRegister = async (eventId) => {
     if (!currentUser) {
       setAlertInfo({
         type: 'error',
@@ -73,7 +73,7 @@ export const Events = () => {
       return;
     }
 
-    const result = registerForEvent(currentUser.email, eventId);
+    const result = await registerForEvent(currentUser.email, eventId);
     if (result.success) {
       setAlertInfo({
         type: 'success',
@@ -116,52 +116,8 @@ export const Events = () => {
   };
 
   return (
-    <div className="relative w-full min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-slate-50 to-indigo-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans overflow-hidden">
+    <div className="relative w-full min-h-screen pt-24 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-slate-50 to-indigo-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans overflow-hidden">
       
-      {/* Premium Futuristic Background Mesh & Light Elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Soft Mesh Gradients */}
-        <motion.div
-          animate={{
-            x: [0, 80, -40, 0],
-            y: [0, -60, 40, 0],
-            scale: [1, 1.15, 0.9, 1]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-purple-300/15 via-lavender-200/10 to-transparent blur-[130px] dark:from-purple-950/10 dark:via-indigo-950/5"
-        />
-        <motion.div
-          animate={{
-            x: [0, -60, 80, 0],
-            y: [0, 80, -60, 0],
-            scale: [1, 0.9, 1.1, 1]
-          }}
-          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/3 right-[-200px] w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-blue-300/15 via-indigo-200/10 to-transparent blur-[120px] dark:from-indigo-950/10 dark:via-slate-900/5"
-        />
-        <motion.div
-          animate={{
-            x: [0, 50, -50, 0],
-            y: [0, 80, -30, 0]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-10 left-[-150px] w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-indigo-300/15 to-purple-200/10 blur-[100px] dark:from-indigo-950/10"
-        />
-
-        {/* Futuristic Minimal Grid Overlay */}
-        <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:32px_32px]" />
-
-        {/* Minimal Abstract Geometric Wave / Circles */}
-        <div className="absolute top-1/4 left-10 w-96 h-96 rounded-full border border-purple-500/[0.04] dark:border-purple-500/[0.08] pointer-events-none" />
-        <div className="absolute top-1/4 left-10 w-[500px] h-[500px] rounded-full border border-indigo-500/[0.02] dark:border-indigo-500/[0.05] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-20 w-80 h-80 rounded-full border border-blue-500/[0.03] dark:border-blue-500/[0.06] pointer-events-none" />
-
-        {/* Subtle Floating Particles / Orbs */}
-        <div className="absolute top-20 left-1/3 w-3 h-3 rounded-full bg-purple-400/20 blur-[1px] animate-pulse" />
-        <div className="absolute top-1/2 right-1/4 w-2 h-2 rounded-full bg-blue-400/20 blur-[1px] animate-pulse" />
-        <div className="absolute bottom-1/3 left-1/4 w-4 h-4 rounded-full bg-indigo-400/20 blur-[2px] animate-pulse" />
-      </div>
-
       {/* Dynamic Toast Feedback Overlay */}
       <AnimatePresence>
         {alertInfo && (
@@ -189,7 +145,7 @@ export const Events = () => {
                 <div>
                   <h3 className="text-lg font-bold text-slate-800 dark:text-white">{alertInfo.message}</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                    {alertInfo.detail}
+                     {alertInfo.detail}
                   </p>
                 </div>
               </div>
@@ -215,48 +171,8 @@ export const Events = () => {
         )}
       </AnimatePresence>
 
-      <div className="max-w-full mx-auto w-full px-4 sm:px-8 lg:px-12 space-y-12 relative z-10">
-        
-        {/* Page Header (Hero Section) */}
-        <div className="text-center max-w-3xl mx-auto space-y-5 pt-8">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 text-xs font-bold uppercase tracking-[0.2em]"
-          >
-            <Sparkles className="h-4 w-4 text-purple-500" />
-            <span>Competitive Events & Workshops</span>
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-6xl font-black tracking-tight leading-tight text-slate-800 dark:text-white font-sans"
-          >
-            Explore Festival{' '}
-            <span className="relative inline-block mt-2 sm:mt-0">
-              <span className="bg-gradient-to-r from-purple-600 via-indigo-500 to-blue-500 bg-clip-text text-transparent">
-                Experiences
-              </span>
-              <motion.span
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-blue-500 rounded-full origin-left opacity-80"
-              />
-            </span>
-          </motion.h1>
-          
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium max-w-2xl mx-auto mt-4 leading-relaxed"
-          >
-            Search and register for premium college fest experiences, technology hackathons, and immersive webinars.
-          </motion.p>
-        </div>
+      <div className="max-w-full mx-auto w-full px-4 sm:px-8 lg:px-12 space-y-8 relative z-10">
+
 
         {/* Search and Filters Bar */}
         <motion.div 

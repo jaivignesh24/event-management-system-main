@@ -11,7 +11,7 @@ export const Navbar = () => {
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
 
-  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/verify') || location.pathname.startsWith('/certificate')) {
+  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/verify') || location.pathname.startsWith('/certificate') || location.pathname.startsWith('/superadmin') || location.pathname.startsWith('/volunteer')) {
     return null;
   }
 
@@ -29,7 +29,7 @@ export const Navbar = () => {
   }, []);
 
   const homePath = currentUser 
-    ? (currentUser.role === 'admin' ? '/admin' : '/dashboard') 
+    ? (currentUser.role === 'superadmin' ? '/superadmin' : (currentUser.role === 'admin' ? '/admin' : (currentUser.role === 'volunteer' ? '/volunteer' : '/dashboard'))) 
     : '/';
 
   const navLinks = [
@@ -55,9 +55,9 @@ export const Navbar = () => {
           : 'bg-white/95 dark:bg-slate-950/90 border-b border-slate-100 dark:border-slate-900 py-4'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
-          <Link to={homePath} className="flex items-center gap-3 group">
+      <div className="w-full px-4 sm:px-6">
+        <div className="flex flex-row flex-nowrap items-center justify-between gap-4 w-full">
+          <Link to={homePath} className="flex-1 flex items-center justify-start gap-3 group whitespace-nowrap">
             <motion.div
               whileHover={{ scale: 1.05, rotateZ: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 10 }}
@@ -75,7 +75,7 @@ export const Navbar = () => {
             </div>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center justify-center gap-8 flex-initial whitespace-nowrap">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -98,7 +98,7 @@ export const Navbar = () => {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center justify-end gap-4 flex-1 whitespace-nowrap">
             {currentUser ? (
               <div className="relative">
                 {/* Avatar Button */}
@@ -119,7 +119,7 @@ export const Navbar = () => {
                       <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
                       <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-3 z-50 text-left space-y-1">
                         <Link
-                          to="/dashboard"
+                          to={currentUser.role === 'superadmin' ? '/superadmin' : (currentUser.role === 'admin' ? '/admin' : (currentUser.role === 'volunteer' ? '/volunteer' : '/dashboard'))}
                           onClick={() => setIsOpen(false)}
                           className="block px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
                         >
@@ -183,7 +183,7 @@ export const Navbar = () => {
             </button>
           </div>
 
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="flex items-center justify-end gap-3 flex-1 lg:hidden">
             <button
               onClick={toggleTheme}
               className="relative inline-flex h-9 w-16 items-center rounded-full border border-slate-200 dark:border-slate-850 bg-slate-100 dark:bg-slate-900 p-1 shadow-inner transition-all cursor-pointer"
@@ -262,6 +262,15 @@ export const Navbar = () => {
                     My Profile
                   </Link>
                 </>
+              )}
+              {currentUser && currentUser.role === 'volunteer' && (
+                <Link
+                  to="/volunteer"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-center px-4 py-3 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold uppercase tracking-wider transition-all text-xs"
+                >
+                  Volunteer Dashboard
+                </Link>
               )}
             </div>
 

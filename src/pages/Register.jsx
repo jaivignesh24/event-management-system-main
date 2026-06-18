@@ -25,8 +25,12 @@ export const Register = () => {
   // Already logged in route guard
   React.useEffect(() => {
     if (currentUser) {
-      if (currentUser.role === 'admin') {
+      if (currentUser.role === 'superadmin') {
+        navigate('/superadmin');
+      } else if (currentUser.role === 'admin') {
         navigate('/admin');
+      } else if (currentUser.role === 'volunteer') {
+        navigate('/volunteer');
       } else {
         navigate('/dashboard');
       }
@@ -72,8 +76,8 @@ export const Register = () => {
     setIsLoading(true);
 
     // Simulate short network delay
-    setTimeout(() => {
-      const response = registerUser({
+    setTimeout(async () => {
+      const response = await registerUser({
         name,
         email: email.toLowerCase(),
         password,
@@ -85,6 +89,8 @@ export const Register = () => {
       if (response.success) {
         if (role === 'admin') {
           navigate('/admin');
+        } else if (role === 'volunteer') {
+          navigate('/volunteer');
         } else {
           navigate('/dashboard');
         }
@@ -249,7 +255,7 @@ export const Register = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider text-white bg-gradient-to-r from-orange-500 via-purple-600 to-blue-500 hover:scale-102 hover:shadow-neon-purple transition-all flex items-center justify-center cursor-pointer shadow-md"
+              className="w-full py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider text-white bg-purple-600 hover:bg-purple-700 transition-all flex items-center justify-center cursor-pointer shadow-md"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

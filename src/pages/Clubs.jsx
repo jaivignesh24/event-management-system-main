@@ -193,7 +193,7 @@ export const Clubs = () => {
 
                   <button
                     onClick={() => navigate('/events')}
-                    className="px-5 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-orange-500 via-purple-600 to-blue-500 hover:scale-105 hover:shadow-neon-purple transition-all cursor-pointer shadow-md"
+                    className="px-5 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider text-white bg-purple-600 hover:bg-purple-700 transition-all cursor-pointer shadow-md"
                   >
                     View Events
                   </button>

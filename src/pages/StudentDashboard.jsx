@@ -90,13 +90,13 @@ export const StudentDashboard = () => {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  const handleCancelRegistration = (eventId) => {
-    unregisterFromEvent(currentUser.email, eventId);
+  const handleCancelRegistration = async (eventId) => {
+    await unregisterFromEvent(currentUser.email, eventId);
   };
 
-  const handleProfileSave = (e) => {
+  const handleProfileSave = async (e) => {
     e.preventDefault();
-    const result = updateProfile({
+    const result = await updateProfile({
       name: profileName,
       phone: profilePhone,
       year: profileYear,
@@ -122,12 +122,12 @@ export const StudentDashboard = () => {
     }
   };
 
-  const handleFeedbackSubmit = (e) => {
+  const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
     const eventObj = registeredEvents.find(e => e.id === feedbackEventId);
     if (!eventObj) return;
 
-    submitFeedback(feedbackEventId, eventObj.title, feedbackRating, feedbackText);
+    await submitFeedback(feedbackEventId, eventObj.title, feedbackRating, feedbackText);
     setFeedbackStatus('Feedback submitted! Thank you.');
     setFeedbackEventId(null);
     setFeedbackText('');

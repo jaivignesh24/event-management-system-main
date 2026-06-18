@@ -27,7 +27,7 @@ export const EventDetails = () => {
   const event = events.find((item) => item.id === eventId);
   const isRegistered = currentUser && (registrations[currentUser.email] || []).includes(eventId);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!currentUser) {
       setAlertInfo({
         type: 'error',
@@ -55,7 +55,7 @@ export const EventDetails = () => {
       return;
     }
 
-    const result = registerForEvent(currentUser.email, eventId);
+    const result = await registerForEvent(currentUser.email, eventId);
     if (result.success) {
       setAlertInfo({ type: 'success', message: 'Successfully Registered!', detail: `You are now registered for ${event.title}. Check your dashboard for entry passes.` });
     } else {

@@ -35,19 +35,6 @@ export const Footer = () => {
             <p className="text-sm text-slate-300 leading-relaxed font-sans mt-2">
               Step into Aurora’s flagship celebration. Explore, compete, and celebrate technical innovation and cultural heritage in premium festival style.
             </p>
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-4">
-              <p className="text-sm uppercase tracking-[0.25em] text-neonPink font-semibold mb-3">Stay in the loop</p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder="Enter your campus email"
-                  className="flex-1 rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-neonPurple/50"
-                />
-                <button className="rounded-3xl bg-gradient-to-r from-neonPurple to-neonPink px-5 py-3 text-sm font-bold text-white transition-all hover:shadow-[0_15px_40px_rgba(236,72,153,0.24)]">
-                  Subscribe
-                </button>
-              </div>
-            </div>
             <div className="flex flex-wrap gap-3 pt-2">
               <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-3 rounded-3xl bg-white/5 hover:bg-neonPink/25 hover:text-white transition-all">
                 <FaInstagram className="h-4 w-4" />

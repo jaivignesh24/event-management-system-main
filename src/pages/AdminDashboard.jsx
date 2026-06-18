@@ -43,14 +43,16 @@ export const AdminDashboard = () => {
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
+  const allowedRoles = ['admin', 'club_head', 'club_coordinator', 'faculty_coordinator', 'volunteer_lead'];
+
   // Route safety guard
   useEffect(() => {
-    if (!currentUser || currentUser.role !== 'admin') {
+    if (!currentUser || !allowedRoles.includes(currentUser.role)) {
       navigate('/login');
     }
   }, [currentUser, navigate]);
 
-  if (!currentUser || currentUser.role !== 'admin') {
+  if (!currentUser || !allowedRoles.includes(currentUser.role)) {
     return null;
   }
 
@@ -110,8 +112,8 @@ export const AdminDashboard = () => {
 
   // 3. Mock Announcements
   const [announcements, setAnnouncements] = useState([
-    { id: 1, title: 'Registrations Open for Acoustics Battle of Bands', date: '2026-05-21', author: 'Monisha (Admin)' },
-    { id: 2, title: 'Barricade and Entry QR scan guidelines published', date: '2026-05-20', author: 'Monisha (Admin)' }
+    { id: 1, title: 'Registrations Open for Acoustics Battle of Bands', date: '2026-05-21', author: 'Jaivignesh (Admin)' },
+    { id: 2, title: 'Barricade and Entry QR scan guidelines published', date: '2026-05-20', author: 'Jaivignesh (Admin)' }
   ]);
   const [newAnnouncement, setNewAnnouncement] = useState('');
 
@@ -541,9 +543,35 @@ export const AdminDashboard = () => {
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
     { id: 'gallery', label: 'Gallery Upload', icon: UploadCloud },
-    { id: 'certificates', label: 'Certificates', icon: Award },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'certificates', label: 'Certificates', icon: Award }
   ];
+
+  const getFilteredSidebarItems = () => {
+    if (!currentUser) return [];
+    if (currentUser.role === 'admin') return sidebarItems;
+    
+    const roleMap = {
+      'club_head': ['overview', 'events', 'students', 'announcements', 'gallery', 'certificates'],
+      'club_coordinator': ['overview', 'events', 'students', 'announcements', 'gallery', 'certificates'],
+      'faculty_coordinator': ['overview', 'events', 'students', 'analytics'],
+      'volunteer_lead': ['overview', 'events', 'students']
+    };
+    
+    const allowedTabs = roleMap[currentUser.role] || ['overview'];
+    return sidebarItems.filter(item => allowedTabs.includes(item.id));
+  };
+
+  const filteredSidebarItems = getFilteredSidebarItems();
+
+  const getRoleLabel = (role) => {
+    if (role === 'admin') return 'System Admin';
+    if (role === 'club_head') return 'Club Head';
+    if (role === 'club_coordinator') return 'Club Coordinator';
+    if (role === 'faculty_coordinator') return 'Faculty Coordinator';
+    if (role === 'volunteer_lead') return 'Volunteer Lead';
+    if (role === 'volunteer') return 'Volunteer';
+    return role;
+  };
 
   return (
     <div className="relative min-h-screen flex bg-slate-50 text-slate-900 dark:bg-[#070913] dark:text-slate-100 transition-colors duration-300 font-sans">
@@ -573,7 +601,7 @@ export const AdminDashboard = () => {
 
           {/* Navigation Links */}
           <nav className="space-y-2 text-left">
-            {sidebarItems.map(item => {
+            {filteredSidebarItems.map(item => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
@@ -611,7 +639,7 @@ export const AdminDashboard = () => {
             <div>
               <h3 className="text-sm sm:text-base font-black text-slate-800 dark:text-white leading-tight">{currentUser.name}</h3>
               <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 mt-1.5 rounded-full bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-cyan-500/10 dark:from-purple-500/20 dark:via-pink-500/20 dark:to-cyan-500/20 text-purple-700 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/40">
-                System Admin
+                {getRoleLabel(currentUser.role)}
               </span>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold font-sans mt-2.5 leading-relaxed">
                 {currentUser.department}
@@ -745,7 +773,7 @@ export const AdminDashboard = () => {
           
           {/* Tab indicator for mobile menu */}
           <div className="flex lg:hidden overflow-x-auto gap-2 pb-3 mb-4 scrollbar-none">
-            {sidebarItems.map(item => {
+            {filteredSidebarItems.map(item => {
               const isActive = activeTab === item.id;
               return (
                 <button
@@ -1497,7 +1525,7 @@ export const AdminDashboard = () => {
                         </div>
                         
                         <div className="text-right">
-                          <span className="font-extrabold text-slate-700 dark:text-slate-350">Monisha</span>
+                          <span className="font-extrabold text-slate-700 dark:text-slate-350">Jaivignesh</span>
                           <span className="block italic text-[9px]">Academic Affairs Coordinator</span>
                         </div>
                       </div>
@@ -1659,66 +1687,6 @@ export const AdminDashboard = () => {
 
             </div>
           )}
-
-          {/* 8. WORKSPACE: Settings */}
-          {activeTab === 'settings' && (
-            <div className="space-y-6 animate-fadeIn">
-              
-              <div>
-                <h2 className="text-xl font-black text-slate-800 dark:text-white">System Configuration</h2>
-                <p className="text-xs text-slate-400 mt-1">Adjust database schedules, registration restrictions, and campus festival policies.</p>
-              </div>
-
-              <div className="glass-card rounded-[2.5rem] p-6 sm:p-8 border border-slate-200/50 dark:border-white/5 space-y-6 text-left">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-400">Administrative Console Title</label>
-                    <input
-                      type="text"
-                      value={sysName}
-                      onChange={(e) => setSysName(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-400">Student Portals Signups Deadline</label>
-                    <input
-                      type="date"
-                      value={sysRegDeadline}
-                      onChange={(e) => setSysRegDeadline(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2 flex items-center justify-between p-4 bg-slate-50 dark:bg-white/2 rounded-2xl border border-slate-200/50 dark:border-white/5">
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-800 dark:text-white">System Maintenance Toggle</h4>
-                      <p className="text-[10px] text-slate-400">Enable offline blockages across Student Dashboards for safety updates.</p>
-                    </div>
-                    <button
-                      onClick={() => setSysMaintenance(!sysMaintenance)}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-white transition-all smooth-transition ${
-                        sysMaintenance ? 'bg-amber-600' : 'bg-slate-400 dark:bg-white/10'
-                      }`}
-                    >
-                      {sysMaintenance ? 'Active (Maintenance Mode)' : 'Offline (Console Normal)'}
-                    </button>
-                  </div>
-
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex justify-end">
-                  <button onClick={() => alert('Settings changes saved successfully!')} className="px-5 py-3 rounded-full text-xs font-black uppercase tracking-wider text-white premium-glow-btn smooth-transition">
-                    Save Config Options
-                  </button>
-                </div>
-              </div>
-
-            </div>
-          )}
-
         </main>
       </div>
 

@@ -19,8 +19,12 @@ export const Login = () => {
   // Already logged in route guard
   useEffect(() => {
     if (currentUser) {
-      if (currentUser.role === 'admin') {
+      if (currentUser.role === 'superadmin') {
+        navigate('/superadmin');
+      } else if (currentUser.role === 'admin') {
         navigate('/admin');
+      } else if (currentUser.role === 'volunteer') {
+        navigate('/volunteer');
       } else {
         navigate('/dashboard');
       }
@@ -35,8 +39,8 @@ export const Login = () => {
       if (source === 'oauth-google' || source === 'oauth-github' || source === 'oauth-twitter') {
         setIsLoading(true);
         setErrorMsg('');
-        setTimeout(() => {
-          const response = loginWithOAuth(user);
+        setTimeout(async () => {
+          const response = await loginWithOAuth(user);
           setIsLoading(false);
           if (response.success) {
             navigate('/dashboard');
@@ -62,6 +66,20 @@ export const Login = () => {
     window.open(popupUrl, `Authorize ${provider}`, `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`);
   };
 
+  const handleQuickFill = (role) => {
+    setErrorMsg('');
+    if (role === 'student') {
+      setEmail('student@aurora.edu.in');
+      setPassword('password');
+    } else if (role === 'admin') {
+      setEmail('admin@aurora.edu.in');
+      setPassword('password');
+    } else if (role === 'superadmin') {
+      setEmail('superadmin@aurora.edu.in');
+      setPassword('password');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -74,13 +92,17 @@ export const Login = () => {
     setIsLoading(true);
 
     // Simulate short network delay
-    setTimeout(() => {
-      const response = login(email, password);
+    setTimeout(async () => {
+      const response = await login(email, password);
       setIsLoading(false);
 
       if (response.success) {
-        if (response.user.role === 'admin') {
+        if (response.user.role === 'superadmin') {
+          navigate('/superadmin');
+        } else if (response.user.role === 'admin') {
           navigate('/admin');
+        } else if (response.user.role === 'volunteer') {
+          navigate('/volunteer');
         } else {
           navigate('/dashboard');
         }
@@ -135,6 +157,7 @@ export const Login = () => {
             )}
           </AnimatePresence>
 
+
           <form onSubmit={handleSubmit} className="space-y-4">
             
             {/* Email Field */}
@@ -150,9 +173,10 @@ export const Login = () => {
                 />
                 <Mail className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
               </div>
-              <div className="text-[10px] text-slate-400 dark:text-slate-500 flex justify-between px-1">
-                <span>Demo Student: <strong className="text-neonCyan">student@aurora.edu.in</strong></span>
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 flex flex-wrap justify-between gap-1.5 px-1">
+                <span>Student: <strong className="text-neonCyan">student@aurora.edu.in</strong></span>
                 <span>Admin: <strong className="text-neonPink">admin@aurora.edu.in</strong></span>
+                <span>Super Admin: <strong className="text-neonPurple">superadmin@aurora.edu.in</strong></span>
               </div>
             </div>
 
@@ -188,7 +212,7 @@ export const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider text-white bg-gradient-to-r from-orange-500 via-purple-600 to-blue-500 hover:scale-102 hover:shadow-neon-purple transition-all flex items-center justify-center cursor-pointer shadow-md"
+              className="w-full py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider text-white bg-purple-600 hover:bg-purple-700 transition-all flex items-center justify-center cursor-pointer shadow-md"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

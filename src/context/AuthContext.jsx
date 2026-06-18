@@ -1,65 +1,33 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
+const API_URL = 'http://localhost:5000/api';
 
 export const AuthProvider = ({ children }) => {
-  // Pre-seed mock users in localStorage if not exists
-  useEffect(() => {
-    if (!localStorage.getItem('users') || 
-        localStorage.getItem('users').includes('Priya Sharma') || 
-        localStorage.getItem('users').includes('Miss Sathwika') || 
-        localStorage.getItem('users').includes('Monisha Sathwika') ||
-        localStorage.getItem('users').includes('"name":"Sathwika"') ||
-        localStorage.getItem('users').includes('Ms Monisah Sathwik') ||
-        localStorage.getItem('users').includes('"name":"Sathwilk"') ||
-        !localStorage.getItem('users').includes('Monisha')) {
-      const defaultUsers = [
-        {
-          name: 'Rohit Kumar',
-          email: 'student@aurora.edu.in',
-          password: 'password',
-          role: 'student',
-          college: 'Aurora Deemed to be University',
-          department: 'Computer Science & Engineering',
-          rollNo: 'AUR2023CSE045',
-          year: '3rd Year'
-        },
-        {
-          name: 'Monisha',
-          email: 'admin@aurora.edu.in',
-          password: 'password',
-          role: 'admin',
-          college: 'Aurora Deemed to be University',
-          department: 'Academic Affairs Coordinators'
-        }
-      ];
-      localStorage.setItem('users', JSON.stringify(defaultUsers));
-
-      // Also migrate active session if it was Priya, Sathwika, Monisha Sathwika, Ms Monisah Sathwik, or Sathwilk
-      const savedUser = localStorage.getItem('current-user');
-      if (savedUser && JSON.parse(savedUser).email === 'admin@aurora.edu.in') {
-        const updatedAdmin = { ...JSON.parse(savedUser), name: 'Monisha' };
-        localStorage.setItem('current-user', JSON.stringify(updatedAdmin));
-        setCurrentUser(updatedAdmin);
-      }
-    }
-  }, []);
-
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('current-user');
     return saved ? JSON.parse(saved) : null;
   });
 
-  const login = (email, password) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-    
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('current-user', JSON.stringify(user));
-      return { success: true, user };
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+      if (response.data.success) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('current-user', JSON.stringify(user));
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message || 'Invalid credentials' };
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Server connection failed. Is the backend running?' 
+      };
     }
-    return { success: false, message: 'Invalid email or password' };
   };
 
   const logout = () => {
@@ -67,156 +35,155 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('current-user');
   };
 
-  const registerUser = (userData) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const exists = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
-    
-    if (exists) {
-      return { success: false, message: 'An account with this email already exists.' };
-    }
-
-    const newUser = {
-      ...userData,
-      role: userData.role || 'student',
-      college: 'Aurora Deemed to be University',
-      rollNo: `AUR2026CSE${Math.floor(100 + Math.random() * 900)}`,
-      year: '1st Year',
-      joinedClubs: [],
-      profilePicture: '',
-      phone: '',
-      achievements: ['First Registration'],
-      activityHistory: [
-        { id: Date.now(), text: 'Account created successfully', time: new Date().toLocaleString() }
-      ]
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    setCurrentUser(newUser);
-    localStorage.setItem('current-user', JSON.stringify(newUser));
-    return { success: true, user: newUser };
-  };
-
-  const loginWithOAuth = (userData) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    let user = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
-    
-    if (!user) {
-      user = {
+  const registerUser = async (userData) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, {
         name: userData.name,
         email: userData.email,
-        password: 'password',
-        role: 'student',
-        college: 'Aurora Deemed to be University',
-        department: 'Computer Science & Engineering',
-        rollNo: `AUR2026CSE${Math.floor(100 + Math.random() * 900)}`,
-        year: '3rd Year',
-        avatar: userData.avatar,
-        joinedClubs: [],
-        profilePicture: userData.avatar || '',
-        phone: '',
-        achievements: ['First Registration'],
-        activityHistory: [
-          { id: Date.now(), text: 'Connected account via OAuth', time: new Date().toLocaleString() }
-        ]
-      };
-      users.push(user);
-      localStorage.setItem('users', JSON.stringify(users));
-    }
-
-    setCurrentUser(user);
-    localStorage.setItem('current-user', JSON.stringify(user));
-    return { success: true, user };
-  };
-
-  const updateProfile = (updatedFields) => {
-    if (!currentUser) return { success: false };
-
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = users.map(u => {
-      if (u.email.toLowerCase() === currentUser.email.toLowerCase()) {
-        const updated = { ...u, ...updatedFields };
-        // Log activity for profile update
-        const currentActivities = updated.activityHistory || [];
-        updated.activityHistory = [
-          { id: Date.now(), text: 'Profile details updated', time: new Date().toLocaleString() },
-          ...currentActivities
-        ];
-        return updated;
+        password: userData.password,
+        department: userData.department,
+        role: userData.role || 'student'
+      });
+      if (response.data.success) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('current-user', JSON.stringify(user));
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message };
       }
-      return u;
-    });
-
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    const newCurrentUser = updatedUsers.find(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
-    setCurrentUser(newCurrentUser);
-    localStorage.setItem('current-user', JSON.stringify(newCurrentUser));
-    return { success: true, user: newCurrentUser };
-  };
-
-  const joinClub = (clubId, clubName) => {
-    if (!currentUser) return { success: false };
-    const currentClubs = currentUser.joinedClubs || [];
-    if (currentClubs.includes(clubId)) return { success: false, message: 'Already joined!' };
-
-    const updatedClubs = [...currentClubs, clubId];
-    
-    // Add achievement if they join their first club
-    const achievements = currentUser.achievements || [];
-    const updatedAchievements = [...achievements];
-    if (!updatedAchievements.includes('Club Enthusiast')) {
-      updatedAchievements.push('Club Enthusiast');
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Server connection failed.' 
+      };
     }
-
-    const currentActivities = currentUser.activityHistory || [];
-    const updatedActivities = [
-      { id: Date.now(), text: `Joined club: ${clubName}`, time: new Date().toLocaleString() },
-      ...currentActivities
-    ];
-
-    return updateProfile({ 
-      joinedClubs: updatedClubs,
-      achievements: updatedAchievements,
-      activityHistory: updatedActivities
-    });
   };
 
-  const leaveClub = (clubId, clubName) => {
-    if (!currentUser) return { success: false };
-    const currentClubs = currentUser.joinedClubs || [];
-    const updatedClubs = currentClubs.filter(id => id !== clubId);
-
-    const currentActivities = currentUser.activityHistory || [];
-    const updatedActivities = [
-      { id: Date.now(), text: `Left club: ${clubName}`, time: new Date().toLocaleString() },
-      ...currentActivities
-    ];
-
-    return updateProfile({ 
-      joinedClubs: updatedClubs,
-      activityHistory: updatedActivities
-    });
-  };
-
-  const submitFeedback = (eventId, eventTitle, rating, feedbackText) => {
-    if (!currentUser) return { success: false };
-    
-    const achievements = currentUser.achievements || [];
-    const updatedAchievements = [...achievements];
-    if (!updatedAchievements.includes('Feedback Contributor')) {
-      updatedAchievements.push('Feedback Contributor');
+  const loginWithOAuth = async (userData) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/oauth`, {
+        name: userData.name,
+        email: userData.email,
+        avatar: userData.avatar || ''
+      });
+      if (response.data.success) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('current-user', JSON.stringify(user));
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message };
+      }
+    } catch (error) {
+      console.error('OAuth login error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Server connection failed.' 
+      };
     }
+  };
 
-    const currentActivities = currentUser.activityHistory || [];
-    const updatedActivities = [
-      { id: Date.now(), text: `Submitted feedback for: ${eventTitle} (Rating: ${rating}/5)`, time: new Date().toLocaleString() },
-      ...currentActivities
-    ];
+  const updateProfile = async (updatedFields) => {
+    if (!currentUser) return { success: false, message: 'No current user' };
+    try {
+      const response = await axios.post(`${API_URL}/auth/profile`, {
+        email: currentUser.email,
+        ...updatedFields
+      });
+      if (response.data.success) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('current-user', JSON.stringify(user));
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message };
+      }
+    } catch (error) {
+      console.error('Profile update error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Server connection failed.' 
+      };
+    }
+  };
 
-    return updateProfile({
-      achievements: updatedAchievements,
-      activityHistory: updatedActivities
-    });
+  const joinClub = async (clubId, clubName) => {
+    if (!currentUser) return { success: false, message: 'No current user' };
+    try {
+      const response = await axios.post(`${API_URL}/clubs/join`, {
+        email: currentUser.email,
+        clubId,
+        clubName
+      });
+      if (response.data.success) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('current-user', JSON.stringify(user));
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message };
+      }
+    } catch (error) {
+      console.error('Join club error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Server connection failed.' 
+      };
+    }
+  };
+
+  const leaveClub = async (clubId, clubName) => {
+    if (!currentUser) return { success: false, message: 'No current user' };
+    try {
+      const response = await axios.post(`${API_URL}/clubs/leave`, {
+        email: currentUser.email,
+        clubId,
+        clubName
+      });
+      if (response.data.success) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('current-user', JSON.stringify(user));
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message };
+      }
+    } catch (error) {
+      console.error('Leave club error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Server connection failed.' 
+      };
+    }
+  };
+
+  const submitFeedback = async (eventId, eventTitle, rating, feedbackText) => {
+    if (!currentUser) return { success: false, message: 'No current user' };
+    try {
+      const response = await axios.post(`${API_URL}/feedback`, {
+        email: currentUser.email,
+        eventId,
+        eventTitle,
+        rating,
+        feedbackText
+      });
+      if (response.data.success) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('current-user', JSON.stringify(user));
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message };
+      }
+    } catch (error) {
+      console.error('Feedback submit error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Server connection failed.' 
+      };
+    }
   };
 
   return (

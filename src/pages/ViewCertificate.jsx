@@ -91,7 +91,7 @@ export const ViewCertificate = () => {
               </div>
               <div className="text-right space-y-1">
                 <p className="font-bold uppercase tracking-wider text-slate-500">Authorized Signatory</p>
-                <p className="font-serif italic text-slate-800 dark:text-slate-200 text-sm font-bold">Monisha</p>
+                <p className="font-serif italic text-slate-800 dark:text-slate-200 text-sm font-bold">Jaivignesh</p>
                 <p className="text-[9px]">Academic Affairs Coordinator</p>
               </div>
             </div>
